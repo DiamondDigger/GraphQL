@@ -18,13 +18,13 @@ const authors = [
 
 const books = [
     {id: 1, name: 'Harry Potter and the Chamber of Secrets', authorId: 1},
-    // {id: 2, name: 'Harry Potter and the Prisoner of Azkaban', authorId: 1},
-    // {id: 3, name: 'Harry Potter and the Goblet of Fire ', authorId: 1},
-    // {id: 4, name: 'The Fellowship of the Ring', authorId: 2},
-    // {id: 5, name: 'The Two Towers', authorId: 2},
-    // {id: 6, name: 'The Return of the King', authorId: 2},
-    // {id: 7, name: 'The way of Shadows', authorId: 3},
-    // {id: 8, name: 'Beyound the Shadows', authorId: 3},
+    {id: 2, name: 'Harry Potter and the Prisoner of Azkaban', authorId: 1},
+    {id: 3, name: 'Harry Potter and the Goblet of Fire ', authorId: 1},
+    {id: 4, name: 'The Fellowship of the Ring', authorId: 2},
+    {id: 5, name: 'The Two Towers', authorId: 2},
+    {id: 6, name: 'The Return of the King', authorId: 2},
+    {id: 7, name: 'The way of Shadows', authorId: 3},
+    {id: 8, name: 'Beyound the Shadows', authorId: 3},
 ]
 
 console.log(typeof(books[0]))
@@ -35,7 +35,22 @@ const BookType = new GraphQLObjectType({
     fields: () => ({
             id: {type: GraphQLNonNull(GraphQLInt)},
             name: {type: GraphQLNonNull(GraphQLString)},
-            authorId: {type: GraphQLNonNull(GraphQLInt)}
+            authorId: {type: GraphQLNonNull(GraphQLInt)},
+            author: {
+                type: AuthorType,
+                resolve: (book) => {
+                    return authors.find(author => author.id === book.authorId)
+                }
+            }
+    })
+})
+
+const AuthorType = new GraphQLObjectType({
+    name: 'Author',
+    description: 'This represents an author of a book',
+    fields: () => ({
+        id: {type: GraphQLNonNull(GraphQLInt)},
+        name: {type: GraphQLNonNull(GraphQLString)}
     })
 })
 
@@ -47,6 +62,11 @@ const RootQueryType = new GraphQLObjectType({
             type: new GraphQLList(BookType),
             description: 'List of All Books',
             resolve: () => books
+        },
+        authors: {
+            type: new GraphQLList(AuthorType),
+            description: 'List of all Authors',
+            resolve: () => authors
         }
     }) 
 })
