@@ -98,7 +98,7 @@ const RootQueryType = new GraphQLObjectType({
     }) 
 })
 
-const RootMutationQuery = new GraphQLObjectType({
+const RootMutationType = new GraphQLObjectType({
     name: 'Mutation',
     description: 'Mutation query',
     fields: () => ({
@@ -132,7 +132,7 @@ const RootMutationQuery = new GraphQLObjectType({
 
 const schema = new GraphQLSchema({
     query: RootQueryType,
-    mutation: RootMutationQuery
+    mutation: RootMutationType
 })
 
 app.use('/graphql', graphqlHTTP({
