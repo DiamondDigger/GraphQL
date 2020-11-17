@@ -8,6 +8,7 @@ const {
     GraphQLList,
     GraphQLInt,
     GraphQLString} = require('graphql')
+const { argsToArgsConfig } = require('graphql/type/definition')
 const app = express()
 
 const authors = [
@@ -70,7 +71,7 @@ const RootQueryType = new GraphQLObjectType({
             args: {
                 id: {type: GraphQLInt}
             },
-            resolve: (parent, args) => {
+            resolve: (book, args) => {
                 return books.find((book) => book.id === args.id )
             }
         },
@@ -85,7 +86,7 @@ const RootQueryType = new GraphQLObjectType({
             args: {
                 id: {type: GraphQLInt}
             },
-            resolve: (parent, args) => {
+            resolve: (author, args) => {
                 return authors.find(author => author.id === args.id)
             }
         },
@@ -97,8 +98,41 @@ const RootQueryType = new GraphQLObjectType({
     }) 
 })
 
+const RootMutationQuery = new GraphQLObjectType({
+    name: 'Mutation',
+    description: 'Mutation query',
+    fields: () => ({
+        addBook: {
+            type: BookType,
+            description: 'Add a single book',
+            args: {
+                name: {type: GraphQLNonNull(GraphQLString)},
+                authorId: {type: GraphQLNonNull(GraphQLInt)}
+            },
+            resolve: (parent, args) => {
+                const book = {id: books.length + 1, name: args.name, authorId: args.authorId }
+                books.push(book)
+                return book
+            }
+        },
+        addAuthor: {
+            type: AuthorType,
+            description: 'Add an author',
+            args: {
+                name: {type: GraphQLNonNull(GraphQLString)}
+            },
+            resolve: (parent, args) => {
+                const author = {id: authors.length + 1, name: args.name}
+                authors.push(author)
+                return author
+            }
+        }
+    })
+})
+
 const schema = new GraphQLSchema({
-    query: RootQueryType
+    query: RootQueryType,
+    mutation: RootMutationQuery
 })
 
 app.use('/graphql', graphqlHTTP({
